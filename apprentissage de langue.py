@@ -9,7 +9,7 @@ TOKEN = 'VOTRE_TOKEN_ICI'
 PREFIX = '!'
 
 # Liste des langues supportées (ajoutez-en plus si nécessaire)
-LANGUES = ['fr', 'en']
+LANGUES = ['fr', 'en', 'es', 'de', 'it']
 
 # Classe pour gérer les exercices
 class LangueBot:
@@ -23,6 +23,10 @@ class LangueBot:
                 {
                     'question': 'Comment dit-on "bonjour" en français ?',
                     'reponse': 'Bonjour'
+                },
+                {
+                    'question': 'Quel est le symbole chimique de l\'hydrogène ?',
+                    'reponse': 'H'
                 }
                 # Ajoutez plus d'exercices ici
             ],
@@ -34,6 +38,55 @@ class LangueBot:
                 {
                     'question': 'How do you say "thank you" in English?',
                     'reponse': 'Thank you'
+                },
+                {
+                    'question': 'What is the chemical symbol for oxygen?',
+                    'reponse': 'O'
+                }
+                # Ajoutez plus d'exercices ici
+            ],
+            'es': [
+                {
+                    'question': '¿Cuál es la capital de España?',
+                    'reponse': 'Madrid'
+                },
+                {
+                    'question': '¿Cómo se dice "hola" en español?',
+                    'reponse': 'Hola'
+                },
+                {
+                    'question': '¿Cuál es el símbolo químico del hidrógeno?',
+                    'reponse': 'H'
+                }
+                # Ajoutez plus d'exercices ici
+            ],
+            'de': [
+                {
+                    'question': 'Was ist die Hauptstadt von Deutschland?',
+                    'reponse': 'Berlin'
+                },
+                {
+                    'question': 'Wie sagt man "Hallo" auf Deutsch?',
+                    'reponse': 'Hallo'
+                },
+                {
+                    'question': 'Was ist das chemische Symbol für Wasserstoff?',
+                    'reponse': 'H'
+                }
+                # Ajoutez plus d'exercices ici
+            ],
+            'it': [
+                {
+                    'question': 'Qual è la capitale dell\'Italia?',
+                    'reponse': 'Roma'
+                },
+                {
+                    'question': 'Come si dice "ciao" in italiano?',
+                    'reponse': 'Ciao'
+                },
+                {
+                    'question': 'Quale è il simbolo chimico dell\'idrogeno?',
+                    'reponse': 'H'
                 }
                 # Ajoutez plus d'exercices ici
             ]
