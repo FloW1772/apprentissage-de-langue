@@ -1,5 +1,6 @@
 import discord
 import random
+import sqlite3
 from discord.ext import commands
 
 # Remplacez "VOTRE_TOKEN_ICI" par le jeton d'authentification de votre bot.
@@ -48,15 +49,27 @@ class LangueBot:
 # Classe pour gérer les scores
 class ScoreManager:
     def __init__(self):
-        self.scores = {}
+        self.conn = sqlite3.connect('scores.db')
+        self.create_table()
 
-    def ajouter_score(self, utilisateur):
-        if utilisateur not in self.scores:
-            self.scores[utilisateur] = 0
-        self.scores[utilisateur] += 1
+    def create_table(self):
+        with self.conn:
+            self.conn.execute('CREATE TABLE IF NOT EXISTS scores (id INTEGER PRIMARY KEY, user_id INTEGER, score INTEGER)')
+
+    def ajouter_score(self, utilisateur, score):
+        with self.conn:
+            self.conn.execute('INSERT INTO scores (user_id, score) VALUES (?, ?)', (utilisateur.id, score))
 
     def obtenir_score(self, utilisateur):
-        return self.scores.get(utilisateur, 0)
+        with self.conn:
+            cursor = self.conn.execute('SELECT SUM(score) FROM scores WHERE user_id = ?', (utilisateur.id,))
+            score = cursor.fetchone()[0]
+            return score if score else 0
+
+    def obtenir_meilleurs_scores(self, limit=10):
+        with self.conn:
+            cursor = self.conn.execute('SELECT user_id, SUM(score) as total_score FROM scores GROUP BY user_id ORDER BY total_score DESC LIMIT ?', (limit,))
+            return cursor.fetchall()
 
 # Classe principale du bot
 class LangueBotCog(commands.Cog):
@@ -87,7 +100,7 @@ class LangueBotCog(commands.Cog):
         try:
             user_response = await self.bot.wait_for('message', timeout=10.0, check=check)
             if self.langue_bot.verifier_reponse(langue, question, user_response.content):
-                self.score_manager.ajouter_score(user_response.author)
+                self.score_manager.ajouter_score(user_response.author, 1)
                 await ctx.send(f'Bravo ! La réponse est correcte : {question["reponse"]}')
             else:
                 await ctx.send(f'Désolé, la réponse est incorrecte. La réponse était : {question["reponse"]}')
@@ -98,6 +111,19 @@ class LangueBotCog(commands.Cog):
     async def score(self, ctx):
         score = self.score_manager.obtenir_score(ctx.author)
         await ctx.send(f'Votre score est de {score} point(s).')
+
+    @commands.command()
+    async def top(self, ctx, limit=10):
+        meilleurs_scores = self.score_manager.obtenir_meilleurs_scores(limit)
+        if meilleurs_scores:
+            message = "Top scores :\n"
+            for i, (user_id, score) in enumerate(meilleurs_scores, start=1):
+                user = ctx.guild.get_member(user_id)
+                user_name = user.name if user else f"Utilisateur inconnu ({user_id})"
+                message += f"{i}. {user_name} - {score} point(s)\n"
+            await ctx.send(message)
+        else:
+            await ctx.send("Aucun score enregistré.")
 
 # Créez une instance du bot avec le préfixe défini
 bot = commands.Bot(command_prefix=PREFIX)
